@@ -84,6 +84,8 @@ function App() {
     },
   ]);
 
+  const itemName = cart.map(item => item.name).join(', ');
+
   // Calculate total dynamically
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
 
@@ -93,7 +95,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<Cart cart={cart} setCart={setCart} />} />
-          <Route path="/payment" element={<Payment total={total} itemsCount={cart.length} />} />
+          <Route path="/payment" element={<Payment total={total} itemsCount={cart.length} itemName={itemName} />} />
           <Route path="/confirmation" element={<Confirmation />} />
         </Routes>
       </div>
