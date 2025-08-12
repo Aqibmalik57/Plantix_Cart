@@ -1,15 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Payment({ total = "0.00", itemsCount = 0 }) {
-      const navigate = useNavigate();
+export default function Payment({ total = "0.00", itemsCount = 0, userId }) {
+  const navigate = useNavigate();
 
-     const handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     navigate("/confirmation", {
       state: {
         total,
         itemsCount,
+        userId,
       },
     });
   };
@@ -32,6 +33,7 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
                 <input
                   type="text"
                   placeholder="John Doe"
+                  value={"jb"}
                   required
                   className="rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
                 />
@@ -43,6 +45,7 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
                 <input
                   type="email"
                   placeholder="john.doe@example.com"
+                  value={"jb@doe.com"}
                   required
                   className="rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
                 />
@@ -57,6 +60,7 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
               <input
                 type="text"
                 placeholder="1234 5678 9012 3456"
+                value={"1234 5678 9012 3456"}
                 maxLength={19}
                 required
                 className="w-full rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
@@ -73,6 +77,7 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
                   type="text"
                   placeholder="MM/YY"
                   maxLength={5}
+                  value={"12/25"}
                   required
                   className="rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
                 />
@@ -84,6 +89,7 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
                 <input
                   type="password"
                   placeholder="•••"
+                  value={"123"}
                   maxLength={4}
                   required
                   className="rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
@@ -99,6 +105,7 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
               <input
                 type="text"
                 placeholder="123 Main St, Apt 4B"
+                value={"123 Main St, Apt 4B"}
                 required
                 className="w-full rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
               />
@@ -110,11 +117,13 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
                 type="text"
                 placeholder="City"
                 required
+                value={"New York"}
                 className="rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
               />
               <input
                 type="text"
                 placeholder="State"
+                value={"NY"}
                 required
                 className="rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
               />
@@ -122,6 +131,7 @@ export default function Payment({ total = "0.00", itemsCount = 0 }) {
                 type="text"
                 placeholder="ZIP Code"
                 maxLength={10}
+                value={"10001"}
                 required
                 className="rounded-3xl px-6 py-5 border border-gray-300 shadow-md placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-400 focus:shadow-lg transition duration-300"
               />

@@ -1,67 +1,84 @@
-import React from 'react';
+import React from "react";
 import {
   FaTrash,
   FaCreditCard,
   FaShoppingCart,
   FaPlus,
   FaMinus,
-} from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+} from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  useIncrementCartItemMutation,
+  useDecrementCartItemMutation,
+  useRemoveItemMutation,
+  useClearCartMutation,
+} from "../Service/api";
 
-export default function Cart({ cart, setCart }) {
+export default function Cart({ cart, userId }) {
   const navigate = useNavigate();
 
-  const increment = (index) => {
-    const updatedCart = [...cart];
-    updatedCart[index].quantity++;
-    setCart(updatedCart);
+  // RTK Query mutations
+  const [incrementCartItem] = useIncrementCartItemMutation();
+  const [decrementCartItem] = useDecrementCartItemMutation();
+  const [removeItem] = useRemoveItemMutation();
+  const [clearCartApi] = useClearCartMutation();
+
+  // Increment
+  const increment = async (productId) => {
+    await incrementCartItem({ userId, productId });
   };
 
-  const decrement = (index) => {
-    const updatedCart = [...cart];
-    if (updatedCart[index].quantity > 1) {
-      updatedCart[index].quantity--;
-      setCart(updatedCart);
-    }
+  // Decrement
+  const decrement = async (productId) => {
+    await decrementCartItem({ userId, productId });
   };
 
-  const removeFromCart = (indexToRemove) => {
-    const updatedCart = cart.filter((_, index) => index !== indexToRemove);
-    setCart(updatedCart);
+  // Remove
+  const removeFromCart = async (productId) => {
+    await removeItem({ userId, productId });
   };
 
-  const clearCart = () => {
-    setCart([]);
+  // Clear all
+  const clearCart = async () => {
+    await clearCartApi(userId);
   };
 
+  // Calculate total
   const total = cart
-    .reduce((sum, item) => sum + item.price * item.quantity, 0)
+    .reduce(
+      (sum, item) =>
+        sum + (Number(item?.productId?.price) || 0) * (item?.quantity || 0),
+      0
+    )
     .toFixed(2);
 
   const proceedToPayment = () => {
     if (cart.length > 0) {
-      navigate('/payment');
+      navigate("/payment");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-gray-200 py-10 px-4">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10">
-
         {/* Cart Section */}
         <div className="lg:col-span-2 bg-white rounded-3xl shadow-lg p-8 border border-gray-200">
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
               <FaShoppingCart className="text-green-600 text-3xl" />
-              <h2 className="text-3xl font-bold text-gray-800">Shopping Cart</h2>
+              <h2 className="text-3xl font-bold text-gray-800">
+                Shopping Cart
+              </h2>
             </div>
             <button
               onClick={clearCart}
               disabled={cart.length === 0}
               className={`px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all
-                ${cart.length === 0
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-red-500 hover:bg-red-600'}`}
+                ${
+                  cart.length === 0
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-red-500 hover:bg-red-600"
+                }`}
             >
               Clear All
             </button>
@@ -72,41 +89,48 @@ export default function Cart({ cart, setCart }) {
             {cart.length > 0 ? (
               cart.map((item, index) => (
                 <div
-                  key={index}
+                  key={item._id || index}
                   className="flex flex-col sm:flex-row items-center justify-between bg-gray-50 p-4 rounded-2xl border border-gray-200 shadow transition-all duration-200 hover:shadow-xl hover:scale-[1.01]"
                 >
+                  {/* Product Info */}
                   <div className="flex items-center gap-5 w-full sm:w-[50%]">
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.productId?.images?.[0]}
+                      alt={item.productId?.title || "Product"}
                       className="w-20 h-20 rounded-xl object-cover border"
                     />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
-                      <p className="text-green-600 font-bold text-sm">${item.price.toFixed(2)}</p>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {item.productId?.title || "Unnamed Product"}
+                      </h3>
+                      <p className="text-green-600 font-bold text-sm">
+                        ${Number(item.productId?.price || 0).toFixed(2)}
+                      </p>
                     </div>
                   </div>
 
+                  {/* Quantity Controls */}
                   <div className="flex items-center gap-3 bg-white px-3 py-1 rounded-full mt-4 sm:mt-0">
                     <button
-                      onClick={() => decrement(index)}
+                      onClick={() => decrement(item.productId?._id)}
                       className="text-gray-700 hover:text-red-600 transition"
                     >
                       <FaMinus />
                     </button>
                     <span className="text-lg font-medium">{item.quantity}</span>
                     <button
-                      onClick={() => increment(index)}
+                      onClick={() => increment(item.productId?._id)}
                       className="text-gray-700 hover:text-green-600 transition"
                     >
                       <FaPlus />
                     </button>
                   </div>
 
+                  {/* Remove Button */}
                   <button
-                    onClick={() => removeFromCart(index)}
+                    onClick={() => removeFromCart(item.productId?._id)}
                     className="text-red-500 hover:text-red-700 mt-4 sm:mt-0 transition"
-                    title={`Remove ${item.name}`}
+                    title={`Remove ${item.productId?.title}`}
                   >
                     <FaTrash size={18} />
                   </button>
@@ -122,12 +146,16 @@ export default function Cart({ cart, setCart }) {
 
         {/* Summary Section */}
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-200 h-fit">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">Order Summary</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-6">
+            Order Summary
+          </h3>
 
           <div className="space-y-4 text-gray-700 font-medium text-sm">
             <div className="flex justify-between border-b pb-2">
               <span>Items</span>
-              <span>{cart.reduce((acc, item) => acc + item.quantity, 0)}</span>
+              <span>
+                {cart.reduce((acc, item) => acc + (item.quantity || 0), 0)}
+              </span>
             </div>
             <div className="flex justify-between border-b pb-2">
               <span>Subtotal</span>

@@ -1,12 +1,30 @@
-import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaCheckCircle, FaFileInvoiceDollar, FaShieldAlt } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaFileInvoiceDollar,
+  FaShieldAlt,
+} from "react-icons/fa";
+import { useClearCartMutation } from "../Service/api";
 
 export default function Confirmation() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { total = "0.00", itemsCount = 0 } = location.state || {};
+  const { total = "0.00", itemsCount = 0, userId } = location.state || {};
+
+  const [clearCartApi] = useClearCartMutation();
+
+  const handleBackToHome = async () => {
+    try {
+      if (userId) {
+        await clearCartApi(userId);
+      }
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
+      navigate("/");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-green-100 to-green-200 flex flex-col items-center justify-center py-20 px-6">
@@ -59,7 +77,8 @@ export default function Confirmation() {
 
         {/* Message */}
         <p className="text-center text-lg text-green-900 max-w-3xl mx-auto mb-16 leading-relaxed tracking-wide">
-          Your payment was successful. We appreciate your business. Below is a summary of your order.
+          Your payment was successful. We appreciate your business. Below is a
+          summary of your order.
         </p>
 
         {/* Summary Sections */}
@@ -92,7 +111,9 @@ export default function Confirmation() {
               Payment Info
             </h2>
             <p className="text-green-900 text-base font-medium leading-relaxed tracking-wide">
-              Payment was processed securely through our gateway. Your card statement will show a charge from <strong>PlantixAG</strong>. Thank you for your trust.
+              Payment was processed securely through our gateway. Your card
+              statement will show a charge from <strong>PlantixAG</strong>.
+              Thank you for your trust.
             </p>
           </section>
         </div>
@@ -101,14 +122,15 @@ export default function Confirmation() {
         <div className="flex items-center justify-center gap-6 mb-12 px-4 md:px-0">
           <FaShieldAlt className="text-green-700 text-4xl drop-shadow-md" />
           <p className="text-green-900 font-medium text-center max-w-3xl tracking-wide leading-relaxed">
-            All transactions are secured and encrypted. We value your privacy and protect your data with industry-standard security measures.
+            All transactions are secured and encrypted. We value your privacy
+            and protect your data with industry-standard security measures.
           </p>
         </div>
 
         {/* Back to Home Button */}
         <div className="flex justify-center">
           <button
-            onClick={() => navigate("/")}
+            onClick={handleBackToHome}
             className="px-14 py-4 bg-gradient-to-r from-green-600 to-green-800 text-white font-extrabold rounded-full shadow-lg hover:from-green-700 hover:to-green-900 active:scale-95 transition-transform duration-300 tracking-wide text-lg"
           >
             Back to Home
